@@ -47,10 +47,10 @@ def crop_objects(img, data, allowed_classes):
             xmin, ymin, xmax, ymax = boxes[i]
             # adjust crop window to stay within image bounds
             h, w, _ = img.shape
-            xmin = max(int(xmin) - 5, 0)
-            ymin = max(int(ymin) - 5, 0)
-            xmax = min(int(xmax) + 5, w)
-            ymax = min(int(ymax) + 5, h)
+            xmin = max(int(xmin) - 10, 0)
+            ymin = max(int(ymin) - 10, 0)
+            xmax = min(int(xmax) + 10, w)
+            ymax = min(int(ymax) + 10, h)
             # crop detection from image
             # print('xmin:', xmin, 'ymin:', ymin, 'xmax:', xmax, 'ymax:', ymax)
             # cropped_img = img[int(ymin)-5:int(ymax)+5, int(xmin)-5:int(xmax)+5]

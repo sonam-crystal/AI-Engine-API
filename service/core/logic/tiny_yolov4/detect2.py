@@ -78,7 +78,7 @@ def object_detector(img):
             pred_conf, (tf.shape(pred_conf)[0], -1, tf.shape(pred_conf)[-1])),
         max_output_size_per_class=50,
         max_total_size=50,
-        iou_threshold=0.3,
+        iou_threshold=0.45,
         score_threshold=0.25
     )
 
@@ -144,7 +144,7 @@ def object_detector(img):
                     pred_conf2, (tf.shape(pred_conf2)[0], -1, tf.shape(pred_conf2)[-1])),
                 max_output_size_per_class=50,
                 max_total_size=50,
-                iou_threshold=0.3,
+                iou_threshold=0.30,
                 score_threshold=0.25
             )
 
@@ -240,14 +240,28 @@ def object_detector(img):
                     sorted_scores = np.delete(sorted_scores, small_digit_index, axis=0)
                     sorted_classes = np.delete(sorted_classes, small_digit_index, axis=0)
 
+            warning = False
+            for score in sorted_scores:
+                if score < 0.4:
+                    warning = True
+                    break
 
             # print("READING::", sorted_digits)
             # print("PARAMETER::",parameter)
 
-            return {
-                "reading": "".join(sorted_digits),
-                "annotation": "".join(parameter)
-            }
+            if warning:
+                return {
+                    "warning": "Some scores are less than 0.4.",
+                    "reading": "".join(sorted_digits),
+                    "annotation": "".join(parameter)
+                }
+            else:
+                return {
+                    "reading": "".join(sorted_digits),
+                    "annotation": "".join(parameter)
+                }
+
+   
             # image2 = utils.draw_bbox(crop, pred_bbox2)
             # # image = utils.draw_bbox(image_data*255, pred_bbox)
             # image2 = Image.fromarray(image2.astype(np.uint8))
