@@ -2,6 +2,7 @@ import os
 # comment out below line to enable tensorflow outputs
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import tensorflow as tf
+import time
 physical_devices = tf.config.experimental.list_physical_devices('GPU')
 if len(physical_devices) > 0:
     tf.config.experimental.set_memory_growth(physical_devices[0], True)
@@ -17,6 +18,16 @@ import numpy as np
 from tensorflow.compat.v1 import ConfigProto
 from tensorflow.compat.v1 import InteractiveSession
 
+interpreter = tf.lite.Interpreter(model_path='service/core/logic/tiny_yolov4/yolov4-tiny-416-fp16.tflite')
+interpreter.allocate_tensors()
+input_details = interpreter.get_input_details()
+output_details = interpreter.get_output_details()
+
+interpreter2 = tf.lite.Interpreter(model_path="service/core/logic/tiny_yolov4/yolov4-tiny-step3-416-fp16.tflite")
+interpreter2.allocate_tensors()
+input_details2 = interpreter2.get_input_details()
+output_details2= interpreter2.get_output_details()
+
 def object_detector(img):
     # flags.DEFINE_string('framework', 'tflite', '(tf, tflite, trt')
     # flags.DEFINE_string('weights', './yolov4-tiny-416-fp16.tflite',
@@ -29,6 +40,8 @@ def object_detector(img):
     # flags.DEFINE_float('iou', 0.30, 'iou threshold')
     # flags.DEFINE_float('score', 0.50, 'score threshold')
     # flags.DEFINE_boolean('crop', True, 'crop detections from images')
+    
+    t_init = time.time()
 
     config = ConfigProto()
     config.gpu_options.allow_growth = True
@@ -57,10 +70,6 @@ def object_detector(img):
     images_data = np.asarray(images_data).astype(np.float32)
 
     # if FLAGS.framework == 'tflite':
-    interpreter = tf.lite.Interpreter(model_path='service/core/logic/tiny_yolov4/yolov4-tiny-416-fp16.tflite')
-    interpreter.allocate_tensors()
-    input_details = interpreter.get_input_details()
-    output_details = interpreter.get_output_details()
    
     interpreter.set_tensor(input_details[0]['index'], images_data)
     interpreter.invoke()
@@ -128,10 +137,7 @@ def object_detector(img):
             images_data2 = np.asarray(images_data2).astype(np.float32)
 
             # if FLAGS.framework == 'tflite':
-            interpreter2 = tf.lite.Interpreter(model_path="service/core/logic/tiny_yolov4/yolov4-tiny-step3-416-fp16.tflite")
-            interpreter2.allocate_tensors()
-            input_details2 = interpreter2.get_input_details()
-            output_details2= interpreter2.get_output_details()
+
         
             interpreter2.set_tensor(input_details2[0]['index'], images_data2)
             interpreter2.invoke()
@@ -254,14 +260,18 @@ def object_detector(img):
             # print("READING::", sorted_digits)
             # print("PARAMETER::",parameter)
 
+            t_elapsed = time.time() - t_init
+
             if warning:
                 return {
-                    "warning": "Some scores are less than 0.4.",
+                    "time_elapsed":str(t_elapsed),
                     "reading": "".join(sorted_digits),
-                    "annotation": "".join(parameter)
+                    "annotation": "".join(parameter),
+                    "warning": "Some scores are less than 0.4."
                 }
             else:
                 return {
+                    "time_elapsed":str(t_elapsed),
                     "reading": "".join(sorted_digits),
                     "annotation": "".join(parameter)
                 }
