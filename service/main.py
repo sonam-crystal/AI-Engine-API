@@ -1,5 +1,5 @@
 # from typing import Union
-
+from fastapi.responses import RedirectResponse
 from fastapi import FastAPI
 
 from service.api.api import main_router
@@ -9,7 +9,8 @@ app.include_router(main_router)
 
 @app.get("/")
 def read_root():
-    return {"Hello": "World"}
+    response = RedirectResponse(url='/docs')
+    return response
 
 
 # @app.get("/items/{item_id}")

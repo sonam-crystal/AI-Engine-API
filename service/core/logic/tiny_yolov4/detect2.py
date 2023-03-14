@@ -107,6 +107,11 @@ def object_detector(img):
     # Assume crops is a numpy array of cropped images returned by crop_objects function
     for crop in crops:
         if crop.shape[0] > 0 and crop.shape[1] > 0:
+
+            if crop.shape[0] > crop.shape[1]:
+            # Rotate the image clockwise by 90 degrees
+                crop = cv2.rotate(crop, cv2.ROTATE_90_CLOCKWISE)
+
             # cv2.imshow('Cropped Image', crop)
             # cv2.waitKey(0)
 
