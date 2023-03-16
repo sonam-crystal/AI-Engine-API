@@ -5,3 +5,4 @@ class Detail(BaseModel):
     image_url: str
     expectedReading: str
     actualReading: str
+    is_match: bool

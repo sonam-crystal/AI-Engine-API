@@ -264,16 +264,16 @@ def object_detector(img):
 
             if warning:
                 return {
-                    "time_elapsed":str(t_elapsed),
                     "reading": "".join(sorted_digits),
                     "annotation": "".join(parameter),
+                    "time":t_elapsed,
                     "warning": "Some scores are less than 0.4."
                 }
             else:
                 return {
-                    "time_elapsed":str(t_elapsed),
                     "reading": "".join(sorted_digits),
-                    "annotation": "".join(parameter)
+                    "annotation": "".join(parameter),
+                    "time":t_elapsed,
                 }
 
    
